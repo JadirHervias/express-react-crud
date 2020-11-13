@@ -1,0 +1,38 @@
+version: '3'
+services:
+  api:
+    build:
+      context: .
+    command: cp package*.json ./
+    command: cp ./src ./
+    command: npm install --production
+    command: npm start
+    container_name: eva2-api
+    restart: always
+    ports:
+      - '6000:6000'
+    environment:
+      # - MONGO_URL=mongodb://mongo:27017/eva2
+      - MONGO_URL=localhost://mongo:27017/eva2
+      - NODE_ENV=production
+    links:
+      - mongo
+    depends_on:
+      - mongo
+    networks:
+      - app-network
+  mongo:
+    image: mongo:latest
+    container_name: eva2-db
+    restart: unless-stopped
+    volumes:
+      - '/data/db:/data/db'
+    ports:
+      - '27017:27017'
+    networks:
+      - app-network
+networks:
+  app-network:
+    driver: bridge
+    ipam:
+      driver: default
